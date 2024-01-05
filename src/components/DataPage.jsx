@@ -114,8 +114,17 @@ const DataPage = function (props) {
           <Button onClick={(event) => handleButtonClick(event, "sleep")}>
             Sleep
           </Button>
+          <Button onClick={(event) => handleButtonClick(event, "temperature")}>
+            Temperature
+          </Button>
+          <Button
+            onClick={(event) =>
+              handleButtonClick(event, "heart-rate-variability")
+            }
+          >
+            Heart rate
+          </Button>
         </div>
-        <br />
       </form>
       <p className="error-text">{errorMsg}</p>
       {dataLoaded ? (
@@ -130,11 +139,13 @@ const DataPage = function (props) {
           >
             Download
           </Button>
-          <JSONViewer
-            name={currentMetricType}
-            groupLength={50}
-            data={userRawData}
-          />
+          <div >
+            <JSONViewer
+              name={currentMetricType}
+              groupLength={50}
+              data={userRawData}
+            />
+          </div>
         </div>
       ) : (
         <p></p>

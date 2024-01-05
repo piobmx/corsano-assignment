@@ -178,7 +178,9 @@ const AuthPage = function (props) {
                   onClick={() => handleCopyClick("health")}
                   className="bg-green-500 "
                 >
-                  Copy
+                  {copyHealthTokenSuccess
+                    ? "Copy Successful!"
+                    : "Copy Health Token"}
                 </Button>
               </div>
             ) : (

@@ -33,13 +33,11 @@ const Sidebar = function () {
   const [current, setCurrent] = useState(currentRoute);
 
   return (
-    <div className="flex flex-col gap-y-1 overflow-y-auto bg-indigo-600 px-6 h-auto w-1/3">
+    <div className="flex sticky grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6">
       <div className="flex h-16 shrink-0 items-center">
-        <h1 className="text-5xl font-bold text-white">
-          <a href="https://corsano.com" target="_blank">
-            <img src={logo} alt="corsano logo"></img>
-          </a>
-        </h1>
+        <a href="https://corsano.com" target="_blank">
+          <img className="h-8 w-auto" src={logo} alt="corsano logo"></img>
+        </a>
       </div>
       <nav className="flex flex-1 flex-col">
         <ul role="list" className="flex flex-1 flex-col gap-y-7">
@@ -53,10 +51,8 @@ const Sidebar = function () {
                     <Link
                       to={item.href}
                       className={classNames(
-                        item.current
-                          ? "bg-indigo-700 text-white"
-                          : "text-indigo-200 hover:text-white hover:bg-indigo-700",
-                        "group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold"
+                        item.current ? 'bg-gray-50' : 'hover:bg-gray-50',
+                        'block rounded-md py-2 pr-2 pl-10 text-sm leading-6 font-semibold text-gray-700'
                       )}
                       onClick={() =>
                         setCurrent(item.href.slice(1, item.href.length))

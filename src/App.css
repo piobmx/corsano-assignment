@@ -1,31 +1,22 @@
-#root {
-  max-width: 1280px;
-  text-align: center;
-}
-
-ul li a:hover {
-  color: #00a8ff;
-}
-
-ul li a.active {
-  color: #00a8ff;
-}
+/* #root { */
+/* max-width: 1280px; */
+/* text-align: center; */
+/* } */
 
 .user-input {
-  @apply appearance-none	leading-tight  block w-full rounded py-3 px-4  italic mb-3
+  @apply appearance-none	leading-tight  block w-full rounded py-3 px-4  italic mb-3;
 }
 
 .main-component {
-  /* @apply w-screen h-screen bg-gray-200 p-10 text-left; */
-  @apply h-screen w-screen bg-gray-200 p-10 text-left;
+  @apply w-screen min-h-screen bg-gray-200 px-3 py-3 text-left;
 }
 
 .label-text {
-  @apply tracking-wide font-bold;
+  @apply tracking-wide text-black;
 }
 
 .title-text {
-  @apply text-4xl my-10 font-bold;
+  @apply text-4xl  text-black;
 }
 
 .error-text {

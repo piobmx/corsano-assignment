@@ -109,7 +109,9 @@ const SummaryPage = function (props) {
           >
             Download
           </Button>
-          <JSONViewer name="Summary" groupLength={50} data={summary} />
+          <div >
+            <JSONViewer name="Summary" groupLength={50} data={summary} />
+          </div>
         </div>
       ) : (
         <p></p>
