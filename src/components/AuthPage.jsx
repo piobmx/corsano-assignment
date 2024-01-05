@@ -44,8 +44,8 @@ const AuthPage = function (props) {
     setLoginState(false);
     setHealthTokenSuccess(false);
     setErrorMsg("");
-    // setCopyUserTokenSuccess(false);
-    // setCopyHealthTokenSuccess(false);
+    setCopyUserTokenSuccess(false);
+    setCopyHealthTokenSuccess(false);
     axios
       .post(
         baseLoginURL,
@@ -58,6 +58,10 @@ const AuthPage = function (props) {
             "Access-Control-Allow-Origin": "*",
             "Content-Type": "application/json",
             "Access-Control-Allow-Methods": "GET, PUT, POST, DELETE, OPTIONS",
+          },
+          proxy: {
+            protocol: "https",
+            host: "127.0.0.1",
           },
         }
       )

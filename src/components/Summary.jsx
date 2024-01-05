@@ -1,4 +1,5 @@
 import Button from "./Button";
+import JSONViewer from "./JSONViewer";
 import React from "react";
 import axios from "axios";
 import exportData from "../utilz";
@@ -9,11 +10,23 @@ const SummaryPage = function (props) {
   const [summary, setSummary] = useState({});
   const [summaryDateFrom, setSummaryDateFrom] = useState("");
   const [summaryDateTo, setSummaryDateTo] = useState("");
+  const [summaryLoaded, setSummaryLoaded] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const summaryAPIBase = "https://api.health.cloud.corsano.com/user-summaries?";
 
+  const handleDownloadSummary = (event) => {
+    event.preventDefault();
+    const jsonData = JSON.stringify(summary);
+    exportData(
+      jsonData,
+      `summary_data_${summaryDateFrom}_${summaryDateTo}.json`,
+      "application/json"
+    );
+  };
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setSummaryLoaded(false);
+    setErrorMsg("");
     const resource = `date_from=${summaryDateFrom}&date_to=${summaryDateTo}`;
     const apiURL = summaryAPIBase + resource;
     axios
@@ -25,14 +38,10 @@ const SummaryPage = function (props) {
       })
       .then((response) => {
         const responseData = response.data;
+        console.log(response);
         setSummary(responseData);
-
-        const jsonData = JSON.stringify(responseData);
-        exportData(
-          jsonData,
-          `summary_data_${summaryDateFrom}_${summaryDateTo}.json`,
-          "application/json"
-        );
+        console.log(summary);
+        setSummaryLoaded(true);
       })
       .catch((error) => {
         // Handle error
@@ -90,6 +99,21 @@ const SummaryPage = function (props) {
         </div>
       </form>
       <p className="error-text">{errorMsg}</p>
+
+      {summaryLoaded ? (
+        <div>
+          <p>Summary retrieved successfully, here is the overview</p>
+          <Button
+            className="my-4"
+            onClick={(event) => handleDownloadSummary(event)}
+          >
+            Download
+          </Button>
+          <JSONViewer name="Summary" groupLength={50} data={summary} />
+        </div>
+      ) : (
+        <p></p>
+      )}
     </div>
   );
 };

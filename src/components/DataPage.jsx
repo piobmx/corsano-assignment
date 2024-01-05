@@ -1,7 +1,9 @@
 import Button from "./Button";
+import JSONViewer from "./JSONViewer";
 import React from "react";
 import axios from "axios";
 import exportData from "../utilz";
+import { json } from "react-router-dom";
 import { useState } from "react";
 
 const DataPage = function (props) {
@@ -9,7 +11,9 @@ const DataPage = function (props) {
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
-  const [userRawData, setUserRawData] = useState();
+  const [dataLoaded, setDataLoaded] = useState(false);
+  const [userRawData, setUserRawData] = useState([]);
+  const [currentMetricType, setCurrentMetricType] = useState("");
   const APIBase = "https://api.health.cloud.corsano.com";
 
   const convertDateToAbsolute = (dateString) => {
@@ -18,10 +22,22 @@ const DataPage = function (props) {
     return absoluteDate;
   };
 
+  const handleDownloadData = (event) => {
+    event.preventDefault();
+    const jsonData = JSON.stringify(userRawData);
+    exportData(
+      jsonData,
+      `${currentMetricType}_data_${dateFrom}_${dateTo}.json`,
+      "application/json"
+    );
+  };
+
   const handleButtonClick = (event, metricType) => {
     event.preventDefault();
-    const resource = `/v2/raw-metrics/${metricType}?from_client_date=${dateFrom}?to_client_date=${dateTo}`;
-    // const resource = `/v2/raw-metrics/${metricType}?from_client_date=2023-12-29T00:12:03.000+01:00?to_client_date=2023-12-29T00:19:03.000+01:00`;
+    setDataLoaded(false);
+    setCurrentMetricType(metricType);
+
+    const resource = `/v2/raw-metrics/${metricType}?from_client_date=${dateFrom}&to_client_date=${dateTo}`;
     const apiUrl = APIBase + resource;
 
     console.log(apiUrl);
@@ -35,12 +51,9 @@ const DataPage = function (props) {
       })
       .then((response) => {
         const data = response.data;
+        setUserRawData(data);
         const jsonData = JSON.stringify(data);
-        exportData(
-          jsonData,
-          `${metricType}_data_${dateFrom}_${dateTo}.json`,
-          "application/json"
-        );
+        setDataLoaded(true);
       })
       .catch((error) => {
         // Handle error
@@ -104,8 +117,28 @@ const DataPage = function (props) {
         </div>
         <br />
       </form>
-
       <p className="error-text">{errorMsg}</p>
+      {dataLoaded ? (
+        <div>
+          <p>
+            Data retrieved successfully, there are {userRawData.length} results
+            in total, here is the overview
+          </p>
+          <Button
+            className="my-4"
+            onClick={(event) => handleDownloadData(event)}
+          >
+            Download
+          </Button>
+          <JSONViewer
+            name={currentMetricType}
+            groupLength={50}
+            data={userRawData}
+          />
+        </div>
+      ) : (
+        <p></p>
+      )}
     </div>
   );
 };

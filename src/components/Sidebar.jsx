@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import React from "react";
+import logo from "../assets/mainLogo.svg";
 import { useLocation } from "react-router-dom";
 import { useState } from "react";
 
@@ -32,10 +33,12 @@ const Sidebar = function () {
   const [current, setCurrent] = useState(currentRoute);
 
   return (
-    <div className="flex flex-col gap-y-1 overflow-y-auto bg-indigo-600 px-6">
+    <div className="flex flex-col gap-y-1 overflow-y-auto bg-indigo-600 px-6 h-auto w-1/3">
       <div className="flex h-16 shrink-0 items-center">
         <h1 className="text-5xl font-bold text-white">
-          <Link to="/">Corsano</Link>
+          <a href="https://corsano.com" target="_blank">
+            <img src={logo} alt="corsano logo"></img>
+          </a>
         </h1>
       </div>
       <nav className="flex flex-1 flex-col">
