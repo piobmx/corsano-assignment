@@ -1,17 +1,8 @@
 import Button from "./Button";
 import React from "react";
 import axios from "axios";
+import exportData from "../utilz";
 import { useState } from "react";
-
-const exportData = (data, fileName, type) => {
-  const blob = new Blob([data], { type });
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = fileName;
-  a.click();
-  window.URL.revokeObjectURL(url);
-};
 
 const DataPage = function (props) {
   const [token, setToken] = useState("");
@@ -19,7 +10,7 @@ const DataPage = function (props) {
   const [dateTo, setDateTo] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [userRawData, setUserRawData] = useState();
-  const APIRoot = "https://api.health.cloud.corsano.com";
+  const APIBase = "https://api.health.cloud.corsano.com";
 
   const convertDateToAbsolute = (dateString) => {
     const dateObj = new Date(dateString);
@@ -30,7 +21,7 @@ const DataPage = function (props) {
   const handleButtonClick = (event, metricType) => {
     event.preventDefault();
     const resource = `/v2/raw-metrics/${metricType}?from_date=${dateFrom}?to_date=${dateTo}`;
-    const apiUrl = APIRoot + resource;
+    const apiUrl = APIBase + resource;
 
     axios
       .get(apiUrl, {
@@ -40,11 +31,14 @@ const DataPage = function (props) {
         },
       })
       .then((response) => {
-        const { data } = response;
+        const data = response.data;
         setUserRawData(data);
-        console.log(response);
         const jsonData = JSON.stringify(data);
-        exportData(jsonData, `${metricType}_data.json`, "application/json");
+        exportData(
+          jsonData,
+          `${metricType}_data_${dateFrom}_${dateTo}.json`,
+          "application/json"
+        );
       })
       .catch((error) => {
         // Handle error
@@ -55,14 +49,7 @@ const DataPage = function (props) {
   return (
     <div>
       <h2 className="title-text">Get Your Data</h2>
-      <p>{dateFrom}</p>
-      <p>{dateTo}</p>
-      <form
-        className="w-full max-w-lg text-left"
-        onSubmit={() => {
-          console.log("formfe");
-        }}
-      >
+      <form className="w-full max-w-lg text-left">
         <label className="label-text">Please enter your token: </label>
         <input
           className="user-input"
@@ -116,7 +103,7 @@ const DataPage = function (props) {
         <br />
       </form>
 
-      <p>{errorMsg}</p>
+      <p className="error-text">{errorMsg}</p>
     </div>
   );
 };

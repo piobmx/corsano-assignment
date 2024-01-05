@@ -15,7 +15,6 @@ ul li a.active {
 
 .user-input {
   @apply appearance-none	leading-tight  block w-full rounded py-3 px-4  italic mb-3
-   /* text-gray-700  ; */;
 }
 
 .main-component {
@@ -28,4 +27,8 @@ ul li a.active {
 
 .title-text {
   @apply text-4xl my-10 font-bold;
+}
+
+.error-text {
+  @apply my-10 text-red-500;
 }

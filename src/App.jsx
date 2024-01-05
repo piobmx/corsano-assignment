@@ -1,6 +1,6 @@
 import "./App.css";
 
-import { Link, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 
 import AuthPage from "./components/AuthPage";
 import DataPage from "./components/DataPage";
@@ -10,13 +10,12 @@ import SummaryPage from "./components/Summary";
 import { useState } from "react";
 
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
     <div>
       <Sidebar />
       <div className="main-component">
         <Routes>
+          <Route path="/" element={<HomePage />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/data" element={<DataPage />} />
           <Route path="/summary" element={<SummaryPage />} />

@@ -11,13 +11,14 @@ const AuthPage = function (props) {
   const [errorMsg, setErrorMsg] = useState("");
   const [token, setToken] = useState("");
   const [copySuccess, setCopySuccess] = useState(false);
+  const BaseLoginURL = "https://api.users.cloud.corsano.com/login";
 
   const handleCopyClick = () => {
     try {
       navigator.clipboard.writeText(token);
       setCopySuccess(true);
     } catch (err) {
-      // console.error("Unable to copy text to clipboard", err);
+      console.error("Unable to copy text to clipboard", err);
       setCopySuccess(false);
     }
   };
@@ -28,13 +29,9 @@ const AuthPage = function (props) {
     setCopySuccess(false);
     setLoginState(false);
     setErrorMsg("");
-
-    // setToken(d.toString());
-    // setLoginState(true);
-
     axios
       .post(
-        "https://api.users.cloud.corsano.com/login",
+        BaseLoginURL,
         {
           email: userCredential,
           password: password,
@@ -46,8 +43,9 @@ const AuthPage = function (props) {
         }
       )
       .then((response) => {
-        // Handle the token or other data if needed
-        const { token } = response.data;
+        // Handle the token
+        const responseData = response.data;
+        const token = responseData.token;
         setToken(token);
         setLoginState(true);
       })

@@ -1,21 +1,21 @@
 import Button from "./Button";
 import React from "react";
 import axios from "axios";
+import exportData from "../utilz";
 import { useState } from "react";
 
 const SummaryPage = function (props) {
   const [token, setToken] = useState("");
+  const [summary, setSummary] = useState({});
   const [summaryDateFrom, setSummaryDateFrom] = useState("");
   const [summaryDateTo, setSummaryDateTo] = useState("");
-  const APIRoot = "https://api.health.cloud.corsano.com/user-summaries?";
+  const [errorMsg, setErrorMsg] = useState("");
+  const summaryAPIBase = "https://api.health.cloud.corsano.com/user-summaries?";
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
-    const apiURL =
-      APIRoot + `date_from=${summaryDateFrom}&date_to=${summaryDateTo}`;
-    console.log(apiURL);
-
+    const resource = `date_from=${summaryDateFrom}&date_to=${summaryDateTo}`;
+    const apiURL = summaryAPIBase + resource;
     axios
       .get(apiURL, {
         headers: {
@@ -24,21 +24,28 @@ const SummaryPage = function (props) {
         },
       })
       .then((response) => {
-        // Handle the token or other data if needed
+        const responseData = response.data;
+        setSummary(responseData);
+
+        const jsonData = JSON.stringify(responseData);
+        exportData(
+          jsonData,
+          `summary_data_${summaryDateFrom}_${summaryDateTo}.json`,
+          "application/json"
+        );
       })
       .catch((error) => {
         // Handle error
         setErrorMsg(
           "Failed getting summary, please check your token and dates."
         );
+        console.error(error);
       });
   };
 
   return (
     <div>
       <h2 className="title-text">Get Your Summary</h2>
-      <p>{summaryDateFrom}</p>
-      <p>{summaryDateTo}</p>
       <form className="w-full max-w-lg text-left">
         <label className="label-text">Your token:</label>
         <input
@@ -82,6 +89,7 @@ const SummaryPage = function (props) {
           </Button>
         </div>
       </form>
+      <p className="error-text">{errorMsg}</p>
     </div>
   );
 };
