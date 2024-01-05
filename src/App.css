@@ -1,7 +1,6 @@
 #root {
   max-width: 1280px;
   padding-right: 2rem;
-  padding-left: 20%;
   text-align: center;
 }
 
@@ -18,7 +17,8 @@ ul li a.active {
 }
 
 .main-component {
-  @apply w-screen h-screen bg-gray-200 p-10 text-left;
+  /* @apply w-screen h-screen bg-gray-200 p-10 text-left; */
+  @apply h-screen w-4/5 bg-gray-200 p-10 text-left;
 }
 
 .label-text {

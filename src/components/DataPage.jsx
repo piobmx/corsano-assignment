@@ -20,8 +20,11 @@ const DataPage = function (props) {
 
   const handleButtonClick = (event, metricType) => {
     event.preventDefault();
-    const resource = `/v2/raw-metrics/${metricType}?from_date=${dateFrom}?to_date=${dateTo}`;
+    const resource = `/v2/raw-metrics/${metricType}?from_client_date=${dateFrom}?to_client_date=${dateTo}`;
+    // const resource = `/v2/raw-metrics/${metricType}?from_client_date=2023-12-29T00:12:03.000+01:00?to_client_date=2023-12-29T00:19:03.000+01:00`;
     const apiUrl = APIBase + resource;
+
+    console.log(apiUrl);
 
     axios
       .get(apiUrl, {
@@ -32,7 +35,6 @@ const DataPage = function (props) {
       })
       .then((response) => {
         const data = response.data;
-        setUserRawData(data);
         const jsonData = JSON.stringify(data);
         exportData(
           jsonData,

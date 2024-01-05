@@ -10,35 +10,54 @@ const AuthPage = function (props) {
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [token, setToken] = useState("");
-  const [copySuccess, setCopySuccess] = useState(false);
-  const BaseLoginURL = "https://api.users.cloud.corsano.com/login";
+  const [healthToken, setHealthToken] = useState("");
+  const [copyUserTokenSuccess, setCopyUserTokenSuccess] = useState(false);
+  const [copyHealthTokenSuccess, setCopyHealthTokenSuccess] = useState(false);
+  const [healthTokenSuccess, setHealthTokenSuccess] = useState(false);
+  const baseLoginURL = "https://api.users.cloud.corsano.com/login";
+  const baseHealthURL = "https://api.health.cloud.corsano.com/login";
 
-  const handleCopyClick = () => {
+  const handleCopyClick = (tokenType) => {
     try {
-      navigator.clipboard.writeText(token);
-      setCopySuccess(true);
+      if (tokenType === "health") {
+        navigator.clipboard.writeText(healthToken);
+        setCopyHealthTokenSuccess(true);
+      }
+      if (tokenType === "user") {
+        navigator.clipboard.writeText(token);
+        setCopyUserTokenSuccess(true);
+      }
     } catch (err) {
       console.error("Unable to copy text to clipboard", err);
-      setCopySuccess(false);
+      if (tokenType === "health") {
+        setCopyHealthTokenSuccess(false);
+      }
+      if (tokenType === "user") {
+        setCopyUserTokenSuccess(false);
+      }
     }
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const d = new Date();
-    setCopySuccess(false);
+
     setLoginState(false);
+    setHealthTokenSuccess(false);
     setErrorMsg("");
+    // setCopyUserTokenSuccess(false);
+    // setCopyHealthTokenSuccess(false);
     axios
       .post(
-        BaseLoginURL,
+        baseLoginURL,
         {
           email: userCredential,
           password: password,
         },
         {
           headers: {
+            "Access-Control-Allow-Origin": "*",
             "Content-Type": "application/json",
+            "Access-Control-Allow-Methods": "GET, PUT, POST, DELETE, OPTIONS",
           },
         }
       )
@@ -58,8 +77,39 @@ const AuthPage = function (props) {
       });
   };
 
+  const handleHealthToken = async (event) => {
+    event.preventDefault();
+    setHealthTokenSuccess(false);
+    axios
+      .post(
+        baseHealthURL,
+        {
+          user_api_token: token,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
+      .then((response) => {
+        // Handle the token
+        console.log(response);
+        const responseData = response.data;
+        const token = responseData.token;
+        setHealthToken(token);
+        setHealthTokenSuccess(true);
+      })
+      .catch((error) => {
+        // Handle error
+        setErrorMsg(
+          "Getting health token failed, please check your username or password and try again."
+        );
+        console.error("Authentication failed, error:", error);
+      });
+  };
   return (
-    <div className="top-component">
+    <div>
       <h2 className="title-text">User Authentication</h2>
       <form className="w-full max-w-lg" onSubmit={handleSubmit}>
         <label className="label-text">Your login: </label>
@@ -100,9 +150,36 @@ const AuthPage = function (props) {
               value={token}
               disabled={true}
             />
-            <Button onClick={handleCopyClick} className="bg-green-500 ">
-              {copySuccess ? "Copy Successful!" : "Copy Token"}
+            <Button
+              onClick={() => handleCopyClick("user")}
+              className="bg-green-500 "
+            >
+              {copyUserTokenSuccess ? "Copy Successful!" : "Copy Token"}
             </Button>
+            <Button onClick={handleHealthToken} className="bg-green-500">
+              Get Health Token
+            </Button>
+            {healthTokenSuccess ? (
+              <div>
+                <label className="label-text">Your Health Token:j</label>
+                <input
+                  className="user-input border-gray-300 disabled:bg-blue-gray-50 disabled:border-2 border-2"
+                  id="health-token-field"
+                  name="health-token"
+                  type="text"
+                  value={healthToken}
+                  disabled={true}
+                />
+                <Button
+                  onClick={() => handleCopyClick("health")}
+                  className="bg-green-500 "
+                >
+                  Copy
+                </Button>
+              </div>
+            ) : (
+              <></>
+            )}
           </div>
         ) : (
           <p className="text-red-500	">{errorMsg}</p>

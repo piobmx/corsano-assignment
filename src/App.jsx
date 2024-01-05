@@ -7,11 +7,10 @@ import DataPage from "./components/DataPage";
 import HomePage from "./components/Home";
 import Sidebar from "./components/Sidebar";
 import SummaryPage from "./components/Summary";
-import { useState } from "react";
 
 function App() {
   return (
-    <div>
+    <div className="flex">
       <Sidebar />
       <div className="main-component">
         <Routes>
