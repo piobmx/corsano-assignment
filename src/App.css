@@ -4,21 +4,30 @@
 /* } */
 
 .user-input {
-  @apply appearance-none	leading-tight  block w-full rounded py-3 px-4  italic mb-3;
+  @apply block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400;
+  @apply focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6;
 }
 
 .main-component {
   @apply w-screen min-h-screen bg-gray-200 px-3 py-3 text-left;
 }
 
+.download-button {
+  @apply bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center my-4;
+}
+
 .label-text {
-  @apply tracking-wide text-black;
+  @apply block text-sm font-medium leading-6 text-gray-900 mt-2;
 }
 
 .title-text {
-  @apply text-4xl  text-black;
+  @apply text-4xl mb-3 font-bold;
 }
 
 .error-text {
-  @apply my-10 text-red-500;
+  @apply my-3 text-red-500;
+}
+
+.fetch-bottom {
+  @apply rounded bg-white px-3 py-2 my-2 mr-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50
 }

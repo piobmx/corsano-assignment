@@ -1,9 +1,10 @@
+import { useEffect, useState } from "react";
+
 import Button from "./Button";
 import JSONViewer from "./JSONViewer";
 import React from "react";
 import axios from "axios";
 import exportData from "../utilz";
-import { useState } from "react";
 
 const SummaryPage = function (props) {
   const [token, setToken] = useState("");
@@ -11,8 +12,26 @@ const SummaryPage = function (props) {
   const [summaryDateFrom, setSummaryDateFrom] = useState("");
   const [summaryDateTo, setSummaryDateTo] = useState("");
   const [summaryLoaded, setSummaryLoaded] = useState(false);
+  const [allowButton, setAllowButton] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [loading, setLoading] = useState(false);
   const summaryAPIBase = "https://api.health.cloud.corsano.com/user-summaries?";
+
+  useEffect(() => {
+    const healthToken = localStorage.getItem("user-health-token");
+    if (healthToken !== null) {
+      setToken(healthToken);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (summaryDateFrom !== "" && summaryDateTo !== "" && token !== "") {
+      console.log(31231);
+      setAllowButton(true);
+    } else {
+      setAllowButton(false);
+    }
+  }, [summaryDateFrom, summaryDateTo]);
 
   const handleDownloadSummary = (event) => {
     event.preventDefault();
@@ -25,6 +44,7 @@ const SummaryPage = function (props) {
   };
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setLoading(true);
     setSummaryLoaded(false);
     setErrorMsg("");
     const resource = `date_from=${summaryDateFrom}&date_to=${summaryDateTo}`;
@@ -49,7 +69,8 @@ const SummaryPage = function (props) {
           "Failed getting summary, please check your token and dates."
         );
         console.error(error);
-      });
+      })
+      .finally(() => setLoading(false));
   };
 
   return (
@@ -93,23 +114,48 @@ const SummaryPage = function (props) {
           required
         />
         <div>
-          <Button className="grid-cols-3	" onClick={handleSubmit}>
-            Download Summary
+          <Button
+            disabled={!allowButton}
+            className={allowButton ? "" : "cursor-not-allowed opacity-50"}
+            onClick={handleSubmit}
+          >
+            Get Summary
           </Button>
         </div>
       </form>
-      <p className="error-text">{errorMsg}</p>
+
+      {allowButton ? (
+        <></>
+      ) : (
+        <p className="label-text">You need to provide token and dates range.</p>
+      )}
+
+      {loading ? (
+        <p className="label-text"> Loading Data...Please wait</p>
+      ) : (
+        <></>
+      )}
+      {errorMsg === "" ? <></> : <p className="error-text">{errorMsg}</p>}
 
       {summaryLoaded ? (
         <div>
-          <p>Summary retrieved successfully, here is the overview</p>
+          <p className="label-text">
+            Summary retrieved successfully, here is the overview
+          </p>
           <Button
-            className="my-4"
+            className="download-button"
             onClick={(event) => handleDownloadSummary(event)}
           >
+            <svg
+              className="fill-current w-4 h-4 mr-2"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+            >
+              <path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z" />
+            </svg>
             Download
           </Button>
-          <div >
+          <div>
             <JSONViewer name="Summary" groupLength={50} data={summary} />
           </div>
         </div>

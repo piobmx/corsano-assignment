@@ -1,10 +1,19 @@
+import { useEffect, useState } from "react";
+
 import Button from "./Button";
 import JSONViewer from "./JSONViewer";
 import React from "react";
 import axios from "axios";
 import exportData from "../utilz";
 import { json } from "react-router-dom";
-import { useState } from "react";
+
+const buttonsData = [
+  { label: "Activities", action: "activity" },
+  { label: "RR-Intervals", action: "rr-interval" },
+  { label: "Sleep", action: "sleep" },
+  { label: "Temperature", action: "temperature" },
+  { label: "Heart rate", action: "heart-rate-variability" },
+];
 
 const DataPage = function (props) {
   const [token, setToken] = useState("");
@@ -14,12 +23,38 @@ const DataPage = function (props) {
   const [dataLoaded, setDataLoaded] = useState(false);
   const [userRawData, setUserRawData] = useState([]);
   const [currentMetricType, setCurrentMetricType] = useState("");
+  const [allowButton, setAllowButton] = useState(false);
+  const [loading, setLoading] = useState(false);
   const APIBase = "https://api.health.cloud.corsano.com";
 
+  useEffect(() => {
+    const healthToken = localStorage.getItem("user-health-token");
+    if (healthToken !== null) {
+      setToken(healthToken);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (dateFrom !== "" && (dateTo !== "") & (token !== "")) {
+      setAllowButton(true);
+    } else {
+      setAllowButton(false);
+    }
+  }, [dateFrom, dateTo]);
+
   const convertDateToAbsolute = (dateString) => {
-    const dateObj = new Date(dateString);
-    const absoluteDate = dateObj.toISOString().slice(0, -1); // remove last "Z" based on the doc
-    return absoluteDate;
+    try {
+      const dateObj = new Date(dateString);
+      if (isNaN(dateObj)) {
+        throw new Error("Invalid date string");
+      }
+
+      const absoluteDate = dateObj.toISOString().slice(0, -1); // remove last "Z" based on the doc
+      return absoluteDate;
+    } catch (error) {
+      console.error("Error converting date:", error.message);
+      return "";
+    }
   };
 
   const handleDownloadData = (event) => {
@@ -34,6 +69,7 @@ const DataPage = function (props) {
 
   const handleButtonClick = (event, metricType) => {
     event.preventDefault();
+    setLoading(true);
     setDataLoaded(false);
     setCurrentMetricType(metricType);
 
@@ -57,15 +93,21 @@ const DataPage = function (props) {
       })
       .catch((error) => {
         // Handle error
-        setErrorMsg("Data retrieval not successful, please check the token.");
-      });
+        console.error(error);
+        setErrorMsg(
+          "Data retrieval not successful, please check the token and the time interval (start to end) is correct"
+        );
+      })
+      .finally(() => setLoading(false));
   };
 
   return (
     <div>
       <h2 className="title-text">Get Your Data</h2>
       <form className="w-full max-w-lg text-left">
-        <label className="label-text">Please enter your token: </label>
+        <label className="label-text">
+          Please enter your health cloud token:{" "}
+        </label>
         <input
           className="user-input"
           id="token-input"
@@ -73,7 +115,7 @@ const DataPage = function (props) {
           name="token"
           type="text"
           value={token}
-          onChange={(ev) => setToken(ev.target.value)}
+          onChange={(event) => setToken(event.target.value)}
         ></input>
         <label className="label-text">Date from: </label>
         <input
@@ -89,7 +131,7 @@ const DataPage = function (props) {
           }}
           required
         ></input>
-        <label className="label-text">Date to: </label>
+        <label className="label-text ">Date to: </label>
         <input
           id="date-to-picker"
           placeholder="Date to"
@@ -103,43 +145,53 @@ const DataPage = function (props) {
           }}
           required
         ></input>
-        <label className="label-text">Choose metric:</label>
+        <label className="label-text ">Choose metric:</label>
         <div>
-          <Button onClick={(event) => handleButtonClick(event, "activity")}>
-            Activities
-          </Button>
-          <Button onClick={(event) => handleButtonClick(event, "rr-interval")}>
-            rr retrieval
-          </Button>
-          <Button onClick={(event) => handleButtonClick(event, "sleep")}>
-            Sleep
-          </Button>
-          <Button onClick={(event) => handleButtonClick(event, "temperature")}>
-            Temperature
-          </Button>
-          <Button
-            onClick={(event) =>
-              handleButtonClick(event, "heart-rate-variability")
-            }
-          >
-            Heart rate
-          </Button>
+          {buttonsData.map((button, index) => (
+            <Button
+              key={index}
+              disabled={!allowButton}
+              className={
+                allowButton ? "" : " mt-1 cursor-not-allowed opacity-50"
+              }
+              onClick={(event) => handleButtonClick(event, button.action)}
+            >
+              {button.label}
+            </Button>
+          ))}
         </div>
       </form>
-      <p className="error-text">{errorMsg}</p>
+      {allowButton ? (
+        <></>
+      ) : (
+        <p className="label-text">You need to provide token and dates range.</p>
+      )}
+      {loading ? (
+        <p className="label-text"> Loading Data...Please wait</p>
+      ) : (
+        <></>
+      )}
+      {errorMsg === "" ? <></> : <p className="error-text">{errorMsg}</p>}
       {dataLoaded ? (
         <div>
-          <p>
+          <p className="label-text">
             Data retrieved successfully, there are {userRawData.length} results
             in total, here is the overview
           </p>
           <Button
-            className="my-4"
+            className="download-button"
             onClick={(event) => handleDownloadData(event)}
           >
+            <svg
+              className="fill-current w-4 h-4 mr-2"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+            >
+              <path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z" />
+            </svg>
             Download
           </Button>
-          <div >
+          <div>
             <JSONViewer
               name={currentMetricType}
               groupLength={50}
